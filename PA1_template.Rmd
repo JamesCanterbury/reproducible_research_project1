@@ -36,7 +36,7 @@ Read in the activity data and change the date field from 'Factor' to 'Date'
 library(plyr)
 library(tidyr)
 library(ggplot2)
-library(lattice)
+
 
 activity <- read.csv("activity.csv"  ) 
 class(activity$date)
@@ -54,7 +54,11 @@ head(activity)
 
 ```
 
-Code to answer section 1 Add detail
+    Calculate the total number of steps taken per day
+    If you do not understand the difference between a histogram and a barplot, research the difference between them. Make a histogram of the total number of steps taken each day
+    Calculate and report the mean and median of the total number of steps taken per day
+    
+I took the mean for each interval to accomodate the missing values.
 ```{r}
 activity_no_na <-subset(activity, steps_na==FALSE, select=c("steps","date", "interval", "id", "steps_na"))
 
@@ -70,7 +74,7 @@ median(total_steps_per_day$V1)
 What is the average daily activity pattern?
 
     Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
-    Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
     
 ```{r}
 interval_mean <-subset(activity, steps_na==FALSE, select=c("steps","date", "interval", "id", "steps_na"))
@@ -83,6 +87,16 @@ ggplot(data=interval_mean , aes(x=interval, y=steps)) +
 
 ```
 
+    Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+```{r}
+interval_mean <-interval_mean  %>% arrange(desc(interval_mean$steps))
+head(interval_mean)
+
+
+```
+   The interval with the highest step value is interval 835
+
+-----
 Imputing missing values
 
 Note that there are a number of days/intervals where there are missing values (coded as NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
@@ -105,6 +119,8 @@ Code to indentify number of missing observations
 ```{r}
 total_observations <- nrow(activity)
 missing_observations <- sum(activity$steps_na)
+print(total_observations )
+print(missing_observations)
 ```
 
 Code to take the interval mean in steps and join back into the activity data and resort by primary key/id
@@ -123,11 +139,17 @@ head(activity %>% arrange(id))
 steps_per_day <- ddply(activity, "date", function(x) {sum.count <- sum(x$modified_steps)}) 
 qplot( steps_per_day$V1 , binwidth=1000, xlab="total number of steps taken each day")
 print(qplot( total_steps_per_day$V1 , binwidth=1000, xlab="total number of steps taken each day"))
-##qplot( activity$modified_steps , binwidth=1000, xlab="Total number of steps taken each day-Modified Value")
+
 
 
 ```
 
+Calculate and report the mean and median total number of steps taken per day.
+
+```{r}
+mean(steps_per_day$V1)
+median(steps_per_day$V1)
+```
 Are there differences in activity patterns between weekdays and weekends?
 
 For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
