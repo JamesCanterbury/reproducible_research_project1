@@ -1,7 +1,7 @@
 ---
 title: "PA1_template.html"
 author: "JC"
-date: "July 30, 2017"
+date: "August 3, 2017"
 output: html_document
 
 ---
@@ -36,6 +36,7 @@ Read in the activity data and change the date field from 'Factor' to 'Date'
 library(plyr)
 library(tidyr)
 library(ggplot2)
+library(lattice)
 
 activity <- read.csv("activity.csv"  ) 
 class(activity$date)
@@ -144,5 +145,11 @@ print(head(activity ))
     Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
 
 ```{r}
+week_mean <- ddply(activity ,c("interval" , "week_part"), function(x) {mean.count <- mean(x$modified_steps)})
+week_mean$mean_steps <- week_mean$V1
+week_mean <- subset(week_mean, select = c("interval", "week_part", "mean_steps"))
 
+
+ggplot(week_mean, aes(interval, mean_steps)) + geom_line() + facet_grid(week_part ~ .) +    xlab("5-minute interval") + ylab("Number of steps")
+             
 ```
